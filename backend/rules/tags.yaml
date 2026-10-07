@@ -1,0 +1,23 @@
+# Auto-tag rules. Edit freely - no code changes needed (then POST /files/retag).
+# For each tag: every distinct keyword / regex that matches adds `weight`;
+# the tag is applied when the total reaches `threshold`.
+tags:
+  Invoice:
+    keywords: [invoice, "invoice number", "amount due", "bill to", subtotal, "due date", "total due", gst, vat]
+    regex: ['\binv[- ]?\d{3,}\b']
+    weight: 1.0
+    threshold: 3.0
+  Contract:
+    keywords: [agreement, "hereby", "party", "parties", "term and termination", "governing law", renewal, "indemnif", confidential]
+    regex: ['\bwhereas\b']
+    weight: 1.0
+    threshold: 3.0
+  Resume:
+    keywords: [resume, "curriculum vitae", "work experience", education, skills, objective, references]
+    regex: ['\b(19|20)\d{2}\s*[-–]\s*((19|20)\d{2}|present)\b']
+    weight: 1.0
+    threshold: 3.0
+  Report:
+    keywords: ["executive summary", findings, conclusion, methodology, "quarterly", recommendations, analysis]
+    weight: 1.0
+    threshold: 3.0
