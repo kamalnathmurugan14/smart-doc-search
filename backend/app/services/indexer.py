@@ -13,7 +13,7 @@ import numpy as np
 from app.config import Settings
 from app.core.chunker import chunk_pages
 from app.core.extractors import extract, page_count
-from app.core.paths import rel_posix
+from app.core.paths import is_inside, rel_posix
 from app.db.session import connect
 from app.services.embedding_index import Embedder
 from app.services.tagger import Tagger
@@ -81,7 +81,7 @@ class Indexer:
         found = []
         for p in sorted(root.rglob("*")):
             rel_parts = p.relative_to(root).parts
-            if any(part.startswith(".") for part in rel_parts) or not p.is_file():
+            if any(part.startswith(".") for part in rel_parts) or not p.is_file() or not is_inside(root, p):
                 continue
             if p.suffix.lower().lstrip(".") in self.s.extensions:
                 found.append(p)

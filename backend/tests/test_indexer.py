@@ -66,3 +66,15 @@ def test_hidden_and_unsupported_ignored(container, docs):
     (docs / "image.png").write_bytes(b"png")
     container.indexer.run_blocking()
     assert last_run(container)["files_seen"] == 5
+
+
+def test_symlink_pointing_outside_docs_root_is_ignored_not_fatal(container, docs, tmp_path):
+    secret = tmp_path / "outside_secret.txt"
+    secret.write_text("TOP SECRET outside the docs folder", encoding="utf-8")
+    (docs / "sneaky.txt").symlink_to(secret)
+    container.indexer.run_blocking()
+    r = last_run(container)
+    assert r["files_seen"] == 5 and r["files_indexed"] == 5 and not r["errors"]  # the run completed normally
+    with connect(container.settings.db_path) as con:
+        assert con.execute("SELECT COUNT(*) FROM files WHERE rel_path='sneaky.txt'").fetchone()[0] == 0
+        assert con.execute("SELECT COUNT(*) FROM chunks WHERE text LIKE '%TOP SECRET%'").fetchone()[0] == 0
